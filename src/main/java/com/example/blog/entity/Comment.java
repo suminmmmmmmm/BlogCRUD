@@ -19,14 +19,15 @@ public class Comment {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(name = "ahthor", nullable = false)
+    @Column(name = "author", nullable = false)
     private String author;
 
     @Column(name = "content",nullable = false)
     private String content;
 
     @Builder
-    public Comment(String author, String content) {
+    public Comment(Article article,String author, String content) {
+        this.article = article;
         this.author = author;
         this.content = content;
     }
