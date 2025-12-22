@@ -1,14 +1,16 @@
 package com.example.blog.domain;
 
+import com.example.blog.entity.Article;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class CommentRequest {
-
+@NoArgsConstructor
+public class UpdateRequest {
+    private String title;
     private String content;
-    private String author;
+
+
 }
