@@ -1,11 +1,13 @@
 package com.example.blog.controller;
 
 import com.example.blog.domain.CommentRequest;
+import com.example.blog.domain.CommentUpdate;
 import com.example.blog.entity.Article;
 import com.example.blog.entity.Comment;
 import com.example.blog.repository.ArticleRepository;
 import com.example.blog.repository.CommentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +22,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,6 +110,71 @@ class CommentControllerTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].author").value(author))
                 .andExpect(jsonPath("$[0].content").value(content));
+
+    }
+
+    @DisplayName("댓글 수정 완료")
+    @Test
+    public void UpdateComments() throws Exception {
+        final String url = "/comments/{articleId}";
+        final String author = "author";
+        final String content = "content";
+
+       Article article = articleRepository.save(
+                Article.builder()
+                        .title("title")
+                        .content("content")
+                        .build()
+        );
+
+       Comment comment = commentRepository.save(
+               Comment.builder()
+                       .article(article)
+                       .author(author)
+                       .content(content)
+                       .build()
+       );
+       final String newContent = "newContent";
+        CommentUpdate update = new CommentUpdate(newContent);
+        ResultActions result = mvc.perform(
+                put(url,comment.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update))
+        );
+
+        result.andExpect(status().isOk());
+        Comment updated = commentRepository.findById(comment.getId()).get();
+        assertThat(updated.getContent()).isEqualTo(newContent);
+    }
+
+    @DisplayName("댓글 삭제")
+    @Test
+    public void deleteComment() throws Exception {
+        final String url = "/comments/{commentId}";
+        final String author = "author";
+        final String content = "content";
+
+        Article article = articleRepository.save(
+                Article.builder()
+                        .title("title")
+                        .content("content")
+                        .build()
+        );
+
+        Comment comment = commentRepository.save(
+                Comment.builder()
+                        .article(article)
+                        .author(author)
+                        .content(content)
+                        .build()
+        );
+
+        ResultActions result = mvc.perform(delete(url,comment.getId()))
+                .andExpect(status().isOk());
+
+        List<Comment> comments = commentRepository.findAll();
+
+        assertThat(comments).isEmpty();
 
     }
   

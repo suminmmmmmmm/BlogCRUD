@@ -2,6 +2,7 @@ package com.example.blog.controller;
 
 import com.example.blog.domain.CommentRequest;
 import com.example.blog.domain.CommentResponse;
+import com.example.blog.domain.CommentUpdate;
 import com.example.blog.entity.Comment;
 import com.example.blog.service.ArticleService;
 import com.example.blog.service.CommentService;
@@ -35,5 +36,19 @@ public class CommentController {
                 .map(CommentResponse::new)
                 .toList();
         return ResponseEntity.ok(comments);
+    }
+
+    // 댓글 수정
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommentResponse>updateComment(@PathVariable("commentId") Long commentId, @RequestBody CommentUpdate update) {
+       Comment comment =  commentService.updateComment(commentId, update);
+       return ResponseEntity.ok(new CommentResponse(comment));
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("commentId") Long commentId) {
+        commentService.deleteComment(commentId);
+        return ResponseEntity.ok().build();
     }
 }

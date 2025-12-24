@@ -1,12 +1,16 @@
 package com.example.blog.service;
 
 import com.example.blog.domain.CommentRequest;
+import com.example.blog.domain.CommentResponse;
+import com.example.blog.domain.CommentUpdate;
 import com.example.blog.entity.Article;
 import com.example.blog.entity.Comment;
 import com.example.blog.repository.ArticleRepository;
 import com.example.blog.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +36,20 @@ public class CommentService {
         return commentRepository.findByArticleId(articleId);
     }
 
+    // 댓글 수정
+    @Transactional
+    public Comment updateComment(Long id, CommentUpdate commentupdate) {
+       Comment saved =  commentRepository.findById(id)
+               .orElseThrow(()->new IllegalArgumentException("존재하지 않는 댓글입니다."));
+       saved.update(commentupdate.getContent());
+       return saved;
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long id) {
+        commentRepository.deleteById(id);
+
+    }
 
 
 }
